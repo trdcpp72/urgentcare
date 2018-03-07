@@ -1,0 +1,85 @@
+{% load  static %}
+<div class="navbar navbar-default navbar-fixed-top navbar-map" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <button type="button" id="btnResetCurLocation" class="btn btn-default navbar-btn-toggle visible-xs" title="Reset your location">
+                <span class="fa fa-location-arrow"></span>
+            </button>
+            <a href='/' class="navbar-brand" title="Home">
+                <h4>Urgent Care and ER Wait Time</h4>
+            </a>
+        </div>
+        <div id="divNavbarMenu" class="navbar-collapse collapse">
+            <div class="navbar-right">
+                <div class="navbar-form navbar-left">
+                    <div class="visible-sm-block navbar-padding-top"></div>
+                    <div class="form-group">
+                        <button id="btnResetCurLocation" class="btn btn-xs btn-default" title="Reset your location">
+                            <span class="fa fa-location-arrow"></span>
+                            <span class="visible-xs-inline">Reset your location</span>
+                        </button>
+                    </div>
+                </div>
+                <form action="/home/geturgentcare/" method="post" id="formGeoAddr" class="navbar-form navbar-left" role="search" style="display: none;">
+                    {% csrf_token %}
+                    <div class="visible-sm-block navbar-padding-top"></div>
+                    <div class="form-group">
+                        <input type="text" class="form-control input-xs zipCode" id="txtGeoAddr" maxlength="10" />
+                    </div>
+                    <div class="form-group">
+                        <button id="btnGeoAddr" type="submit" class="btn btn-xs btn-default" title="Search">
+                            <span class="glyphicon glyphicon-search"></span>
+                            <span class="visible-xs-inline">Search</span>
+                        </button>
+                    </div>
+                </form>
+
+                <form action="/home/geturgentcare/" class="navbar-form navbar-left" data-ajax="true" data-ajax-failure="indexWaitTimes.AjaxFail" data-ajax-method="POST" data-ajax-success="indexWaitTimes.RefreshDataSuccess" id="formIndexFacilities" method="post">
+                    <div class="visible-sm-block navbar-padding-top"></div>
+                    {% csrf_token %}
+                    <input type="hidden" name="csrfmiddlewaretoken" id="csrfmiddlewaretoken" value="{{ csrf_token }}"/>
+                    <input data-val="true" data-val-required="The SelectedOrganizationId field is required." id="SelectedOrganizationId" name="SelectedOrganizationId" type="hidden" value="" />
+                    <input data-val="true" data-val-required="The ResetMapBounds field is required." id="ResetMapBounds" name="ResetMapBounds" type="hidden" value="True" />
+                    <div class="form-group">
+                        <div class="btn-group" data-toggle="buttons">
+                                <label class="btn btn-xs btn-default">
+                                    <span class="glyphicon"></span>
+                                    <input type="radio" name="SelectedFacilityTypeCodes" id="SelectedFacilityTypeCodes_ED" value="ED" class="facility_type" />
+                                        Emergency
+                                </label>
+                                <label class="btn btn-xs btn-default active">
+                                    <span class="glyphicon"></span>
+                                    <input type="radio" name="SelectedFacilityTypeCodes" id="SelectedFacilityTypeCodes_UC" value="UC" class="facility_type" checked="checked" />
+                                        Urgent Care
+                                </label>
+                        </div>
+                        <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modelHelp"><span class="fa fa-question"></span></button>
+                    </div>
+                    <div class="form-group"></div>
+
+                    <div class="form-group">
+                        <button id="btnIndexFacilities" type="submit" class="btn btn-xs btn-default" title="Refresh">
+                            <span class="glyphicon glyphicon-refresh"></span>
+                            <span class="visible-xs-inline">Refresh</span>
+                        </button>
+                    </div>
+                 </form>
+                <div class="navbar-form navbar-left">
+                    <div class="visible-sm-block navbar-padding-top"></div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-default btn-sm " data-toggle="modal" data-target="#modelFeedback" id="btnCreateFeedback1"  title="Provide Feedback" >
+                            <span class="fa fa-comment"></span>
+                            <span class="visible-xs-inline">Provide Feedback</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

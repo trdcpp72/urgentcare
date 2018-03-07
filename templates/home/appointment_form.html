@@ -1,0 +1,203 @@
+{% load static %}
+<div id="divModalDialogContent" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="titleLabelContent" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-custom-style">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="titleLabelContent">
+                    Patient Information Form
+                </h4>
+            </div>
+            <div class="modal-body modal-body-custom-style">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        <strong>
+                          {{ ucare_data.facility_type }} -  {{ ucare_data.name }}
+                        </strong>
+                        <p class="small">
+                            {{ ucare_data.address }}
+                        </p>
+                        <p>
+                            <a href="tel:+{{ ucare_data.phone_number }}" class="btn btn-sm btn-default">{{ ucare_data.phone_number }}</a>&nbsp;
+                            <a href="https://maps.google.com/maps?daddr={{ ucare_data.address }}" target="_blank" class="GoogleDirections btn btn-sm btn-default">Directions</a>&nbsp;
+                            <a href="{{ ucare_data.website }}" target="_blank" class="btn btn-sm btn-default">Website</a>
+                        </p>
+
+              {% if ucare_data.weekday_text != "na" %}
+                <button type="button" class="btn btn-link btn-xs" data-toggle="collapse" data-target="div#divFacilityHours_45a787ff-fdc5-4ed9-bda8-7fd4442f0785">
+                    <span>Business Hours</span>
+                    <span class="glyphicon glyphicon-chevron-down"></span>
+                </button>
+                <div id="divFacilityHours_45a787ff-fdc5-4ed9-bda8-7fd4442f0785" class="collapse">
+                    <span class="label label-default">
+                        <span class="glyphicon glyphicon-time"></span>
+                            Pacific Standard Time
+                        </span>
+                <div class="row small">
+                <div class="col-sm-6 text-muted">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ ucare_data.Monday }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ ucare_data.Tuesday }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ ucare_data.Wednesday }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ ucare_data.Thrusday }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ ucare_data.Friday }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ ucare_data.Saturday }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ ucare_data.Sunday }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                </div>
+    </div>
+    </div>
+
+              {% endif %}
+</div>
+                </div>
+                <hr/>
+                <form action="/appointments/appointmentform/" class="form-horizontal" data-ajax="true" data-ajax-begin="$.blockUI" data-ajax-complete="$.unblockUI" data-ajax-failure="indexWaitTimes.AjaxFail" data-ajax-method="POST" data-ajax-success="indexWaitTimes.CreateSubSuccess" id="formCreateSubscription" method="post" role="form">
+
+
+                    <div class="form-group">
+
+                        <input name="csrfmiddlewaretoken" type="hidden" value="{{ csrf_token }}" />
+
+                        <div class="col-sm-6">
+                            <label class="control-label" for="Name">Name<span class="mandatory" title="Required">*</span></label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input class="form-control" data-val="true" data-val-length="Max 100" data-val-length-max="100"  data-val-required="Required!" id="name" name="name" type="text" placeholder="Name" />
+                            <input name="facility_type" type="hidden" value="{{ ucare_data.facility_type }}" />
+                            <input name="urgentcare_id" type="hidden" value="{{ ucare_data.id }}" />
+                            <input name="urgencare_name" type="hidden" value="{{ ucare_data.name }}" />
+                            <input name="urgentcare_address" type="hidden" value="{{ ucare_data.address }}" />
+                            <input name="urgentcare_phone" type="hidden" value="{{ ucare_data.phone_number }}" />
+                        </div>
+                    </div>
+
+
+                     <div class="form-group">
+                        <div class="col-sm-6">
+                            <label class="control-label" for="Name">Family Name<span class="mandatory" title="Required">*</span></label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input class="form-control" data-val="true" data-val-length="Max 100" data-val-length-max="100" id="family_name" name="family_name" type="text" placeholder="Family Name" data-val-required="Required!"/>
+                        </div>
+                    </div>
+
+
+                     <div class="form-group">
+                        <div class="col-sm-6">
+                            <label class="control-label" for="Phone">Phone<span class="mandatory" title="Required">*</span></label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input class="form-control" data-val="true" data-val-length="Max 12" data-val-length-max="12" id="phone_number" name="phone_number" type="text" placeholder="Phone"  data-val-required="Required!"/>
+                        </div>
+                    </div>
+                     <div class="form-group">
+                        <div class="col-sm-6">
+                            <label class="control-label" for="Gender">Gender<span class="mandatory" title="Required">*</span></label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select name="gender" id="gender" class="form-control" required>
+                                <option value="">None</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+
+                     <div class="form-group">
+                        <div class="col-sm-6">
+                            <label class="control-label" for="Age">Age<span class="mandatory" title="Required">*</span></label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input class="form-control" data-val="true" data-val-length="Max 3" data-val-length-max="3" id="age" name="age" type="number" placeholder="Age" min="0" max="125"  data-val-required="Required!"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-6">
+                            <label class="control-label" for="Non-life Threatening Illnesses">Medical Problem<span class="mandatory" title="Required">*</span></label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select name="threatening_illnesses" id="threatening_illnesses" class="form-control"  required>
+                                <option value="">None</option>
+                                <option value="Fractures">Fractures</option>
+                                <option value="Whiplash">Whiplash</option>
+                                <option value="Sprain or strain of the ankle, knee, or shoulder">Sprain or strain of the ankle, knee, or shoulder</option>
+                                <option value="Cuts and lacerations">Cuts and lacerations</option>
+                                <option value="Burns">Burns</option>
+                                <option value="Injury from falls">Injury from falls</option>
+                                <option value="Minor Injury from car accidents">Minor Injury from car accidents</option>
+                                <option value="Urinary tract infections">Urinary tract infections</option>
+                                <option value="Yeast infections">Yeast infections</option>
+                                <option value="Pink eye">Pink eye</option>
+                                <option value="Mono">Mono</option>
+                                <option value="Bronchitis">Bronchitis</option>
+                                <option value="Colds">Colds</option>
+                                <option value="Flu">Flu</option>
+                                <option value="Ear Infection">Ear Infection</option>
+                                <option value="Swollen glands">Swollen glands</option>
+                                <option value="Rash">Rash</option>
+                                <option value="Wheezing">Wheezing</option>
+                                <option value="Sore throat">Sore throat</option>
+                                <option value="Minor abdominal pain">Minor abdominal pain</option>
+                                <option value="Diarrhea">Diarrhea</option>
+                                <option value="Headaches">Headaches</option>
+                                <option value="Other unexplained pain or swelling">Other unexplained pain or swelling</option>
+                                {% if ucare_data.facility_type == "Emergency Room" %}
+                                <option value="Other Emergency Problem">Other Emergency Problem</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-6">
+                            <label class="control-label" for="Your Main Medical Problem">Brief Explanations</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input class="form-control" data-val="true" data-val-length="255" data-val-length-max="255" id="brief_explanations" name="brief_explanations" type="text" placeholder="Brief Explanations" />
+                        </div>
+                    </div>
+
+
+
+
+
+                    <div class="col-sm-12">
+                        <div class="text-left">
+                            <input type="submit" class="btn btn-default" value="Submit" />
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                    </form>
+                <hr />
+            </div>
+        </div>
+    </div>
+</div>

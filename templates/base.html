@@ -1,0 +1,802 @@
+{% load  static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Welcome to Urgent Care</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <!-- Boot straps -->
+    <link href="{% static "css/style.css" %}" rel="stylesheet" />
+    <link href="{% static "css/jqplotcss.css" %}" rel="stylesheet" />
+    <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet"/>
+    <link rel=stylesheet href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
+    <style type="text/css">
+	html, body {
+		height: 100%;
+	}
+	div#body {
+		height: 100%;
+		padding: 0;
+	}
+	@media (min-width: 768px) {
+		div#footer {
+			position: static;
+			bottom: 0;
+			width: 100%;
+			border-top: 1px solid #e7e7e7;
+			/* Set the fixed height of the footer here */
+			height: 30px;
+			padding: 4px 8px 8px;
+			/*max-height: 10%;*/
+			background-color: #969696;
+			color: #ffffff !important;
+		}
+		div#footer a {
+			color: #ffffff !important;
+		}
+	}
+</style>
+<style type="text/css">
+#map-canvas{
+  height: 671px;
+  width: 49%;
+  margin: 20px 0;
+  border: 5px solid #fafafa;
+}
+</style>
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="{% static "js/html5shiv.js" %}"></script>
+        <![endif]-->
+    <!-- Fav and touch icons -->
+{#    <link rel="shortcut icon" href="#"/>#}
+
+      <script type="text/javascript">
+          var static_url = "{% static "/" %}";
+      </script>
+  </head>
+  <body>
+      <!-- Start Header -->
+        {% include 'header.html' %}
+      <!-- End Header -->
+      <!-- Start Content -->
+            {% block content %}
+            <!--  -->
+            {% endblock %}
+
+      <!-- End Content -->
+
+      <!-- Start Footer -->
+        {% include 'footer.html' %}
+        <!-- End Footer -->
+
+        <div id="divBlockUIMsg" class="displayNone">
+             <h4>
+                <span class="fa fa-cog fa-spin" title="Loading"></span>
+                Loading...
+            </h4>
+        </div>
+  <!-- Inclue Java Script  -->
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+{#      <script type="text/javascript" src='https://maps.googleapis.com/maps/api/js?key=AIzaSyDelg2upOnLqRHIgrkIZ07T30RbxY3xZv4&v=3&sensor=true&libraries=geometry'></script>#}
+      <script type="text/javascript" src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBUxW2i1DpTxHksBHOB44M8QEOLQAF54Vg&v=3&sensor=true&libraries=geometry'></script>
+
+
+      <script src="{% static "js/jqueryunobtrusive.js" %}"></script>
+      <script src="{% static "js/jqueryval.js" %}"></script>
+      <script src="{% static "js/mapslibs.js" %}"></script>
+      <script src="{% static "js/jqplot.js" %}"></script>
+      <script src="{% static "js/bootstrap.min.js" %}"></script>
+      <script src="{% static "js/watermark.js" %}"></script>
+      <script src="{% static "js/toastr.js" %}"></script>
+      <script src="{% static "js/blockui.js" %}"></script>
+
+      <script type="text/javascript">
+            $(function () {
+                toastr.options = {
+                    "closeButton": true,
+                    "debug": false,
+                    "positionClass": "toast-bottom-left",
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                };
+
+                $.blockUI.defaults.baseZ = 2000;
+                $.blockUI.defaults.message = $("div#divBlockUIMsg");
+            });
+      </script>
+      <script type="text/javascript">
+            var geocoder;
+            var map;
+            var latitude;
+            var longitude;
+            var infoWindow = new google.maps.InfoWindow({
+            maxWidth: 280,
+            pixelOffset: { width: 0, height: 0 },
+            content: '<div><h5 class="noWrap"><span class="glyphicon glyphicon-user"></span> You are here.</h5></div>'
+            });
+            var markerCurrLoc = new google.maps.Marker({
+            icon: {
+                url: static_url +'images/bluedot.png',
+                scaledSize: new google.maps.Size(24, 24)
+            },
+            draggable: true,
+            optimized: false,
+            zIndex: (google.maps.Marker.MAX_ZINDEX + 1)
+        });
+        var markersFacs = [];
+
+        google.maps.event.addDomListener(window, "load", InitializeMap);
+
+    function InitializeMap() {
+
+        geocoder = new google.maps.Geocoder();
+
+        var mapOptions = {
+            mapTypeControl: false,
+            streetViewControl: false,
+            center: new google.maps.LatLng(33.6648187, -117.8819934),
+            zoom: 12
+        };
+        map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+        google.maps.event.addListener(markerCurrLoc, "click", function() {
+            infoWindow.setOptions({
+                pixelOffset: { width: 0, height: 0 },
+                content: '<div class="container-fluid"><h4><span class="glyphicon glyphicon-user"></span> You are here.</h4></div>'
+            });
+            infoWindow.open(map, markerCurrLoc);
+        });
+
+        google.maps.event.addListener(map, "tilesloaded", function() {
+            if($(window).data('blockUI.isBlocked')) $.unblockUI();
+            //console.count("map loaded");
+        });
+    }
+
+    $(function() {
+        //InitializeMap();
+        indexWaitTimes.UpdateNavbarMenuUi();
+        $("body").css("background-color", "");
+        var serviceAreaOutOfBoundsModalVisible = false;
+        var serviceAreaIgnoreUserCurLocation = false;
+        var divModalDialog = $("div#divModalDialog");
+        divModalDialog.html($("div#divSplash").html());
+        var divModalDialogContent = divModalDialog.find("div#divModalDialogContent");
+
+        //trigger click option
+        //setTimeout(function() {
+          //  $("button#btnContinueWaitTimes").trigger('click');
+        //}, 500);
+
+        divModalDialog.find("button#btnContinueWaitTimes").click(function() {
+            // Set current location
+            $.blockUI({ message: null });
+            $("form#formGeoAddr").submit();
+            divModalDialog.find("div#divModalContent911").fadeOut("fast", function() {
+                //focus on emergency model box
+                divModalDialog.find("div#divModalContentPatientType").fadeIn("fast", function() {
+                    divModalDialog.find("button#btnUrgentCare").focus();
+                    });
+                });
+        });
+
+        //on button click
+        $("#btnlocationsearch").click(function() {
+            var zipcode = $("input#search_zipcode").val();
+            $("input#txtGeoAddr").val(zipcode);
+            $("form#formGeoAddr").submit();
+        });
+
+        //on key enter search_zipcode fields
+        $("input#search_zipcode").keypress(function(event) {
+            if(event.keyCode == 13) { // 13 = Enter Key
+                var zipcode = $("input#search_zipcode").val();
+                $("input#txtGeoAddr").val(zipcode);
+                $("form#formGeoAddr").submit();
+            }
+        });
+
+        divModalDialog.find("button#btnEmergency").click(function() {
+
+            $("input:radio[name='SelectedFacilityTypeCodes'][value='ED']").click();
+            if(serviceAreaOutOfBoundsModalVisible)
+                indexWaitTimes.serviceAreaOutOfBoundsModal(divModalDialog);
+            else
+                divModalDialogContent.modal("hide");
+        });
+        divModalDialog.find("button#btnUrgentCare").click(function() {
+            $("input:radio[name='SelectedFacilityTypeCodes'][value='UC']").change();
+            if(serviceAreaOutOfBoundsModalVisible)
+                indexWaitTimes.serviceAreaOutOfBoundsModal(divModalDialog);
+            else
+                divModalDialogContent.modal("hide");
+        });
+        divModalDialog.find("button#btnIgnoreCurLocYes").click(function() {
+            serviceAreaIgnoreUserCurLocation = true;
+            $("form#formGeoAddr").submit();
+            divModalDialogContent.modal("hide");
+        });
+        divModalDialog.find("button#btnIgnoreCurLocNo").click(function() {
+            divModalDialogContent.modal("hide");
+        });
+        divModalDialogContent.on("shown.bs.modal", function(e) {
+            divModalDialog.find("button#btnContinueWaitTimes").focus();
+        });
+        divModalDialogContent.on("hidden.bs.modal", function(e) {
+            divModalDialog.empty();
+        });
+        divModalDialogContent.modal({
+            keyboard: false,
+            backdrop: "static"
+        });
+
+
+        $("input#txtGeoAddr").watermark("Zip Code");
+
+        $("form#formGeoAddr").submit(function(e) {
+
+            e.preventDefault();
+            var geoAddr = $(this).find("input#txtGeoAddr").val();
+            // Check if geocoder address is empty
+            if (geoAddr === "") {
+                // Check if GPS is available (Geolocation support)
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            var fromLat = position.coords.latitude;
+                            var fromLon = position.coords.longitude;
+                            latitude  = fromLat;
+                            longitude = fromLon;
+                            var currLocLatLng = new google.maps.LatLng(fromLat, fromLon);
+
+                            var distanceToOrgGeoCenter = (google.maps.geometry.spherical.computeDistanceBetween(
+                                new google.maps.LatLng(fromLat, fromLon),
+                                new google.maps.LatLng(33.6648187, -117.8819934)) * 0.000621371).toFixed(2);
+
+                            var geoRadius = 25;
+                            if(distanceToOrgGeoCenter > geoRadius) {
+                                //serviceAreaOutOfBoundsModalVisible = true;
+                                if (serviceAreaIgnoreUserCurLocation) {
+                                    currLocLatLng = new google.maps.LatLng(33.6648187, -117.8819934);
+                                }
+                            }
+                            indexWaitTimes.SetCurrentLocation(currLocLatLng);
+                            //console.log('User current location  latitude is '+ fromLat + ' and longitude: '+ fromLon);
+
+                        },
+                        function(error) {
+                            if($(window).data('blockUI.isBlocked')) $.unblockUI();
+                            var errorMsg = "";
+                            switch(error.code) {
+                                case error.PERMISSION_DENIED:
+                                    errorMsg = "User denied the request for Geolocation."
+                                    break;
+                                case error.POSITION_UNAVAILABLE:
+                                    errorMsg = "Location information is unavailable."
+                                    break;
+                                case error.TIMEOUT:
+                                    errorMsg = "The request to get user location timed out."
+                                    break;
+                                case error.UNKNOWN_ERROR:
+                                default:
+                                    errorMsg = "An unknown error occurred."
+                                    break;
+                            }
+                            latitude = "33.6648187";
+                            longitude = "-117.8819934";
+                            toastr.info(errorMsg);
+                            console.log('Error occurred. Error code: ' + error.code);
+                        },
+                        {
+                            timeout           : 10000 //10 * 1000
+                        });
+                } else {
+                    // Set to organization's center
+                    indexWaitTimes.SetCurrentLocation(new google.maps.LatLng(33.6648187, -117.8819934));
+                    //toastr.info("Set to organization's center!");
+                    //console.log('Geolocation is not supported by this Browser/OS.');
+                }
+            } else {
+                geocoder.geocode({"address": geoAddr }, function(results, status) {
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        indexWaitTimes.SetCurrentLocation(results[0].geometry.location);
+
+                        latitude = results[0].geometry.location.lat();
+                        longitude = results[0].geometry.location.lng();
+                        var uc_type = $('input[name=SelectedFacilityTypeCodes].facility_type:checked').val();
+                        indexWaitTimes.loadJsonData(uc_type);
+
+                    } else {
+                        toastr.warning("User's address location not found!");
+                    }
+                });
+            }
+            indexWaitTimes.PossiblyCollapseNavbar();
+        });
+
+
+        indexWaitTimes.UpdateFacilityTypesUi();
+        $("input:radio[name='SelectedFacilityTypeCodes']").change(function() {
+            indexWaitTimes.UpdateFacilityTypesUi();
+            var uc_type = $('input[name=SelectedFacilityTypeCodes].facility_type:checked').val();
+            indexWaitTimes.loadJsonData(uc_type);
+        });
+
+
+        $("a#aHelpChoosing").click(function() {
+            divModalDialog.html($("div#divHelpChoosing").html());
+            divModalDialogContent = divModalDialog.find("div#divModalDialogContent");
+            divModalDialogContent.on("hidden.bs.modal", function(e) {
+                divModalDialog.empty();
+            });
+            divModalDialogContent.modal();
+        });
+
+        $("form#formIndexFacilities").submit(function(e) {
+
+
+            //var uc_type = $('input[name=SelectedFacilityTypeCodes].facility_type:checked').val();
+            //alert(uc_type);
+
+            var $input = $("<input />").attr("type", "hidden").attr("name", "latitude").attr("value", latitude);
+            $("form#formIndexFacilities").append($input);
+            var $input = $("<input />").attr("type", "hidden").attr("name", "longitude").attr("value", longitude);
+            $("form#formIndexFacilities").append($input);
+
+            indexWaitTimes.PossiblyCollapseNavbar();
+        });
+
+        if($("form#formCreateFeedback").length > 0){
+
+                var divModalDialogContent = divModalDialog.find("div#divModalDialogContent");
+
+                // Check if modal loaded properly
+                if (divModalDialogContent.length > 0) {
+                    $.validator.unobtrusive.parse("form#formCreateFeedback");
+                    divModalDialog.find("input#Email").watermark("person@domain.com");
+                    divModalDialog.find("textarea#Comments").watermark("Comment on why you did or did not like this website and/or suggestions for improving it...");
+
+                    $("input:radio", "form#formCreateFeedback").change(function () {
+                        $(this).valid();
+
+                        var strongLikedMsg = $(this).closest(".form-group").find("strong#strongLikedMsg");
+                        var strongDislikedMsg = $(this).closest(".form-group").find("strong#strongDislikedMsg");
+
+                        var selVal = $(this).val() === "True";
+
+                        if (selVal) {
+                            strongDislikedMsg.hide();
+                            strongLikedMsg.show();
+                        } else {
+                            strongLikedMsg.hide();
+                            strongDislikedMsg.show();
+                        }
+                    });
+
+                    divModalDialogContent.on("shown.bs.modal", function (e) {
+                        divModalDialog.find("input#Email").focus();
+                        $.unblockUI();
+                    });
+                    divModalDialogContent.on("hidden.bs.modal", function(e) {
+                        divModalDialog.empty();
+                    });
+                    divModalDialogContent.modal();
+                } else {
+                    $.unblockUI();
+                    toastr.error(responseText, "Problem");
+                }
+
+        }
+
+        $("button#btnResetCurLocation").click(function() {
+            serviceAreaIgnoreUserCurLocation = false;
+            $("input#txtGeoAddr").val("");
+            $("form#formGeoAddr").submit();
+        });
+
+        $(document).on("shown.bs.collapse", "div[id^='divFacilityHours_'], div[id^='divUcSvcList_'], div[id^='divDefineWaitTime_']", function() {
+            $(this).prev().find("span.glyphicon").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-up");
+            //$(this).prev("button").find("span.glyphicon").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-up");
+        });
+
+        $(document).on("hidden.bs.collapse", "div[id^='divFacilityHours_'], div[id^='divUcSvcList_'], div[id^='divDefineWaitTime_']", function() {
+            $(this).prev().find("span.glyphicon").removeClass("glyphicon-chevron-up").addClass("glyphicon-chevron-down");
+            //$(this).prev("button").find("span.glyphicon").removeClass("glyphicon-chevron-up").addClass("glyphicon-chevron-down");
+        });
+
+        $(window).resize(function() {
+            clearTimeout(this.id);
+            this.id = setTimeout(indexWaitTimes.DoneResizing, 300);
+        });
+
+        var refreshInterval = window.setInterval(function() {
+            var inputResetMapBounds = $("input#ResetMapBounds", "form#formIndexFacilities");
+
+            // NOTE: I DON'T LIKE THIS SOLUTION, BUT IT WORKS! THERE CAN BE RACE CONDITIONS!
+            inputResetMapBounds.val(false);
+            indexWaitTimes.RefreshData(function() {
+                inputResetMapBounds.val(true);
+            });
+        }, 150000);
+
+    });
+
+    indexWaitTimes = function() {
+        function DoneResizing() {
+            $("div#divModalDialog div.waitTimeChartJqPlot").each(function(index, element) {
+                var divWaitTimeChartJqPlot = $(this);
+                var plot = divWaitTimeChartJqPlot.data("jqplot");
+                // Problem with cached column widths: https://groups.google.com/forum/#!topic/jqplot-users/xIk1jxxlnRQ
+                $.each(plot.series, function(index, series) {
+                    series.barWidth = undefined;
+                });
+                plot.replot();
+                //console.log("jqPlot replotted!");
+            });
+
+            indexWaitTimes.UpdateNavbarMenuUi();
+            //console.log("Window resized!");
+        }
+
+        function PossiblyCollapseNavbar() {
+            //if ($(".navbar-toggle").is(":visible")) {
+            //    console.log("Navbar collapsed!");
+            //    $(".navbar-collapse").collapse("hide");
+            //}
+        }
+
+        function UpdateNavbarMenuUi() {
+            // Check if the screen width is a small device (768px - 991px, inclusive)
+            var screenWidth = $(window).width();
+            if (screenWidth >= 768 && screenWidth <= 991) {
+                // Change all navbar header controls Bootstrap input/btn CSS class from -sm to -xs
+                $("div#divNavbarMenu").find(".input-sm").removeClass("input-sm").addClass("input-xs");
+                $("div#divNavbarMenu").find(".btn-sm").removeClass("btn-sm").addClass("btn-xs");
+            } else {
+                // Change all navbar header controls Bootstrap input/btn CSS class from -xs to -sm
+                $("div#divNavbarMenu").find(".input-xs").removeClass("input-xs").addClass("input-sm");
+                $("div#divNavbarMenu").find(".btn-xs").removeClass("btn-xs").addClass("btn-sm");
+            }
+        }
+
+        function UpdateFacilityTypesUi() {
+            $("input:radio[name='SelectedFacilityTypeCodes']:checked").closest("label").find("span.glyphicon").removeClass("glyphicon-unchecked").addClass("glyphicon-check");
+            $("input:radio[name='SelectedFacilityTypeCodes']:not(:checked)").closest("label").find("span.glyphicon").removeClass("glyphicon-check").addClass("glyphicon-unchecked");
+        }
+
+        function DeleteFacilityMarkers() {
+            $.each(markersFacs, function(index, markerFac) {
+                markerFac.setMap(null);
+            });
+
+            // Clear the facility markers array
+            markersFacs = [];
+        }
+
+        function BuildMarkerBounds() {
+
+            var markerBounds = new google.maps.LatLngBounds();
+
+            // Extend to current location (if available)
+            if (markerCurrLoc != null && markerCurrLoc.getPosition() != null) {
+                markerBounds.extend(markerCurrLoc.getPosition());
+            }
+
+            // Extend to facility locations (if any)
+            $.each(markersFacs, function(index, markerFac) {
+                markerBounds.extend(markerFac.getPosition());
+            });
+
+            return markerBounds;
+        }
+
+        function SetCurrentLocation(position) {
+
+            markerCurrLoc.setOptions({
+                position: position,
+                map: map
+            });
+
+            // Trigger click for info window
+            google.maps.event.trigger(markerCurrLoc, "click");
+
+
+            setMaxInitialZoomLevel();
+            map.fitBounds(indexWaitTimes.BuildMarkerBounds());
+        }
+
+
+        function RefreshData(callbackFn) {
+
+           var uc_type = $('input[name=SelectedFacilityTypeCodes].facility_type:checked').val();
+            indexWaitTimes.loadJsonData(uc_type);
+            // Call callback
+            if (callbackFn != undefined && typeof callbackFn == 'function') {
+                callbackFn.call(this);
+            }
+        }
+
+        function RefreshDataSuccess(data) {
+
+            var resetMapBounds = data.resetMapBounds;
+            if (data.success) {
+                // Clear the facility markers
+                indexWaitTimes.DeleteFacilityMarkers();
+
+                var element_length = data.facilities.length;//get length
+                $("#closer-to-you").html("");
+
+                for (var k =0;k < element_length;k++){
+
+                    console.log("place details "+data.facilities[k]);
+                    var facility_id = data.facilities[k].Id;
+                    var place_id = data.facilities[k].place_id;
+                    //add script in html box
+
+                    var service_type = data.service_type;
+                    var opennow = "";
+                    var output = '<section class="check-in"><div class="row" id="id'+facility_id+'"><div class="col-xs-2">\n' +
+                        '<div class="wait-time call-now"><div class="vcard"><div class="minutes"><strong>'+data.facilities[k].waittime+'<strong></div></div><div class="h6">EST WAIT </div><div class="h4"><a href="#"><!--CALL NOW--></a></div></div>\n' +
+                        '</div><div class="col-xs-10"><div class="location-details">\n' +
+                        '<div class="vcard"><span class="store-title" onclick="fncOnTitleClick(34.046167,-118.260957,80925);">'+data.facilities[k].name+'</span>\n' +
+                        '<p><span class="street-address sal-loc">'+data.facilities[k].address+'</span></p><p><button type="button" class="btn btn-sm btn-primary" id="appointmentbox" onclick="indexWaitTimes.appointmentbox(\''+facility_id+'\',\''+service_type+'\', \''+place_id+'\')">CHECK ME IN</button></p></div>\n' +
+                        '</div>\n' +
+                        '</div>\n' +
+                        '</div></section>';
+
+                    $("#closer-to-you").append(output);
+
+                    var  mapIconHtml = "<div class='map_indicator'><a href='#id"+facility_id+"' class='iconclick'><img src='/static/images/blue_map_icon.png' alt='"+data.facilities[k].name+"' title='"+data.facilities[k].name+"' /></a></div>";
+
+                    var marker = new RichMarker({
+                            position: new google.maps.LatLng(data.facilities[k].Latitude, data.facilities[k].Longitude),
+                            anchor: 'Top',
+                            map: map,
+                            optimized: false,
+                            zIndex: -99,
+                            flat: true,
+                            content: mapIconHtml,
+
+                        });
+                        markersFacs.push(marker);
+                       /* google.maps.event.addListener(marker, "click", function() {
+                            click event
+                        });*/
+                        // Check if we should reset the map bounds
+                        if (resetMapBounds) {
+                            setMaxInitialZoomLevel();
+                            // Extend markerBounds with each marker drawn
+                            map.fitBounds(indexWaitTimes.BuildMarkerBounds());
+                        }
+
+                }
+
+                //toastr.info(data.message, data.title && data.title.length > 0 ? data.title : "Success");
+            } else {
+                toastr.error(data.message, data.title && data.title.length > 0 ? data.title : "Problem");
+            }
+        }
+
+        function CreateSubSuccess(data) {
+            if (data.success) {
+
+                // Clear the form
+                toastr.success(data.message, data.title && data.title.length > 0 ? data.title : "Success");
+                $("#urgentcare_id").val("");
+                $("#urgencare_name").val("");
+                $("#urgentcare_address").val("");
+                $("#name").val("");
+                $("#family_name").val("");
+                $("#phone_number").val("");
+                $("#gender").val("");
+                $("#age").val("");
+                $("#brief_explanations").val("");
+                $("div#divModalDialogContent").modal("hide");
+            } else {
+                toastr.error(data.message, data.title && data.title.length > 0 ? data.title : "Problem");
+            }
+        }
+
+        function CreateFeedbackSuccess(data) {
+            if (data.success) {
+                toastr.success(data.message, data.title && data.title.length > 0 ? data.title : "Success");
+                // Hide the modal
+                $("div#modelFeedback input#Email").val("");
+                $("div#modelFeedback textarea#Comments").val("");
+                $("div#modelFeedback input[type='radio']").checked = false;
+                $("div#modelFeedback").modal("hide");
+            } else {
+                toastr.error(data.message, data.title && data.title.length > 0 ? data.title : "Problem");
+            }
+        }
+
+        function AjaxFail(jqXHR, textStatus, errorThrown) {
+            toastr.error("There was a problem! Please try again.", "Problem");
+        }
+
+        function serviceAreaOutOfBoundsModal(divModalDialog) {
+            divModalDialog.find("div#divModalContentPatientType").fadeOut("fast", function() {
+                divModalDialog.find("div#divModalContentServiceArea").fadeIn("fast", function() {
+                    divModalDialog.find("button#btnIgnoreCurLocYes").focus();
+                });
+            });
+        }
+
+        function setMaxInitialZoomLevel() {
+            google.maps.event.addListenerOnce(map, 'bounds_changed', function(event) {
+                map.setZoom(Math.min(16, map.getZoom()));
+            });
+        }
+
+
+        /* Start coding for load  hospital data from python script*/
+
+        function loadJsonData(uc_type){
+
+                var csrftoken = $('#csrfmiddlewaretoken').val();
+                $.ajax({
+                    url: "/home/geturgentcare/",
+                    data:{
+                        SelectedFacilityTypeCodes: uc_type,
+                        latitude:latitude,
+                        longitude:longitude,
+                        csrfmiddlewaretoken: csrftoken
+                    },
+                    type: "POST",
+                    dataType: 'json',
+                    success: function (result) {
+                        indexWaitTimes.RefreshDataSuccess(result) ;
+                    }
+                });
+        }
+
+        function appointmentbox(facilityid, service_type, place_id){
+
+                var divMapCanvas = $("div#map-canvas");
+                            //divMapCanvas.block();
+                            $.blockUI();
+                            //latitude:latitude,
+                            //longitude:longitude,
+                            $("div#divModalDialog").load('/home/urgentcaredatails/?Id=' + facilityid+'&latitude='+latitude+'&longitude='+longitude+'&service_type='+service_type+"&place_id="+place_id, function(responseText, textStatus, XMLHttpRequest) {
+
+                                var divModalDialog = $(this);
+                                var divModalDialogContent = divModalDialog.find("div#divModalDialogContent");
+
+                                // Check if modal loaded properly
+                                if (divModalDialogContent.length > 0) {
+                                    divModalDialog.find("button.SwitchPatientTypeFacility.active").find("span.glyphicon").addClass("glyphicon-ok");
+                                    divModalDialog.find("button.SwitchPatientTypeFacility:not(.active)").find("span.glyphicon").removeClass("glyphicon-ok");
+
+                                    //var modalDialog = divModalDialogContent.find("div.modal-dialog");
+
+                                    divModalDialog.find("div#divModalContentFacility button.SwitchPatientTypeFacility:not(.active)").click(function() {
+                                        //layoutMap.BlockElement(modalDialog);
+
+                                        divModalDialog.find("div#divModalContentFacility").fadeOut("fast", function() {
+                                            divModalDialog.find("div#divModalContentPatientTypeAltFacility").fadeIn("fast", function() {
+                                                //layoutMap.UnblockElement(modalDialog);
+                                                var divModalContentThis = $(this);
+                                                divModalContentThis.find("div.waitTimeChartJqPlot").each(function(index, element) {
+                                                    var divWaitTimeChartJqPlot = $(this);
+                                                    var plot = divWaitTimeChartJqPlot.data("jqplot");
+                                                    // Check if it's NOT yet been drawn
+                                                    if (plot._drawCount === 0) {
+                                                        plot.replot();
+                                                    }
+                                                });
+                                            });
+                                        });
+                                    });
+                                    divModalDialog.find("div#divModalContentPatientTypeAltFacility button.SwitchPatientTypeFacility:not(.active)").click(function() {
+                                        //layoutMap.BlockElement(modalDialog);
+
+                                        divModalDialog.find("div#divModalContentPatientTypeAltFacility").fadeOut("fast", function() {
+                                            divModalDialog.find("div#divModalContentFacility").fadeIn("fast", function() {
+                                                //layoutMap.UnblockElement(modalDialog);
+                                                var divModalContentThis = $(this);
+                                                divModalContentThis.find("div.waitTimeChartJqPlot").each(function(index, element) {
+                                                    var divWaitTimeChartJqPlot = $(this);
+                                                    var plot = divWaitTimeChartJqPlot.data("jqplot");
+                                                    // Check if it's NOT yet been drawn
+                                                    if (plot._drawCount === 0) {
+                                                        plot.replot();
+                                                    }
+                                                });
+                                            });
+                                        });
+                                    });
+
+                                    // Check if current location is known
+                                    if (markerCurrLoc != null && markerCurrLoc.getPosition() != null) {
+                                        divModalDialog.find("a.GoogleDirections").attr("href", divModalDialog.find("a.GoogleDirections").attr("href") + "&saddr=" + markerCurrLoc.getPosition().toString());
+                                    }
+
+                                    divModalDialog.find("input#CreateSubscription_Email").watermark("person@domain.com");
+                                    $.validator.unobtrusive.parse("form#formCreateSubscription");
+
+                                    divModalDialogContent.on("shown.bs.modal", function(e) {
+                                        //divMapCanvas.unblock();
+                                        $.unblockUI();
+
+                                        divModalDialog.find("div.waitTimeChartJqPlot").each(function(index, element) {
+                                            var divWaitTimeChartJqPlot = $(this);
+                                            var chartDataX = divWaitTimeChartJqPlot.prev().val().split("|");
+                                            var chartDataY = divWaitTimeChartJqPlot.next().val().split("|");
+                                            var seriesColor = divWaitTimeChartJqPlot.closest("div[data-series-color]").attr("data-series-color");
+
+                                            divWaitTimeChartJqPlot.jqplot([chartDataY], {
+                                                seriesDefaults: {
+                                                    color: seriesColor,
+                                                    renderer: $.jqplot.BarRenderer,
+                                                    rendererOptions: {
+                                                        highlightMouseOver: false
+                                                    },
+                                                    renderOptions: {
+                                                        fillToZero: true
+                                                    }
+                                                },
+                                                axes: {
+                                                    xaxis: {
+                                                        renderer: $.jqplot.CategoryAxisRenderer,
+                                                        ticks: chartDataX
+                                                    },
+                                                    yaxis: {
+                                                        min: 0,
+                                                        max: 90,
+                                                        tickInterval: 30,
+                                                        tickOptions: {
+                                                            formatString: "%d min"
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                        });
+                                    });
+                                    divModalDialogContent.on("hidden.bs.modal", function(e) {
+                                        divModalDialog.empty();
+                                    });
+                                    divModalDialogContent.modal();
+                                } else {
+                                    //divMapCanvas.unblock();
+                                    $.unblockUI();
+                                    toastr.error(responseText, "Problem");
+                                }
+                            });
+
+
+            }
+
+        /* End coding for load  hospital data from python script*/
+
+        return {
+            DoneResizing: DoneResizing,
+            PossiblyCollapseNavbar: PossiblyCollapseNavbar,
+            UpdateNavbarMenuUi: UpdateNavbarMenuUi,
+            UpdateFacilityTypesUi: UpdateFacilityTypesUi,
+            //UpdatePatientTypesUi: UpdatePatientTypesUi,
+            DeleteFacilityMarkers: DeleteFacilityMarkers,
+            BuildMarkerBounds: BuildMarkerBounds,
+            SetCurrentLocation: SetCurrentLocation,
+            RefreshData: RefreshData,
+            RefreshDataSuccess: RefreshDataSuccess,
+            CreateSubSuccess: CreateSubSuccess,
+            CreateFeedbackSuccess: CreateFeedbackSuccess,
+            AjaxFail: AjaxFail,
+            serviceAreaOutOfBoundsModal: serviceAreaOutOfBoundsModal,
+            setMaxInitialZoomLevel: setMaxInitialZoomLevel,
+            loadJsonData: loadJsonData,
+            appointmentbox:appointmentbox
+        }
+    }();
+    </script>
+  </body>
+</html>

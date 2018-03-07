@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+    <div class="container">
+      <!-- Example row of columns -->
+        <div class="row">
+            <div class="location-search">
+                <!-- Start Map -->
+                <div class="col-lg-6">
+                    <div id="body" class="container body-content-map">
+                        <div id="map-canvas"></div>
+                        <div id="divModalDialog"></div>
+                        <div id="divSplash">
+
+                        <div id="divModalDialogContent" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="titleLabelContent" aria-hidden="true">
+                        <div class="modal-dialog">
+                                <div id="divModalContent911" class="modal-content">
+                                    <div class="modal-header modal-header-custom-style">
+                                       <h4 class="modal-title" id="titleLabelContent">
+                                            Urgent Care and ER Wait Time
+                                        </h4>
+                                    </div>
+                                    <div class="modal-body modal-body-custom-style">
+                                            <div class="text-center">
+                                                <p>&nbsp;</p>
+                                                <p>Urgent Care Get Current Location. Please allow current location.</p>
+                                                <div>
+                                                    <button id="btnContinueWaitTimes" type="button" class="btn btn-default">Continue<span class="glyphicon glyphicon-chevron-right"></span></button>
+                                                </div>
+                                                <p>&nbsp;
+                                                </p>
+                                            </div>
+                                    </div>
+                                </div>
+                                <div id="divModalContentPatientType" class="modal-content displayNone">
+                                    <div class="modal-header modal-header-custom-style">
+                                           <h4 class="modal-title" id="titleLabelContent">
+                                                    Urgent Care and ER Wait Time
+                                            </h4>
+                                    </div>
+                                     <div class="modal-body modal-body-custom-style">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <p class="alert alert-danger">
+                                                            If this is a life-threatening emergency, please stop and call 911 immediately.
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-lg-12">
+                                                        <p>
+                                                            If you have any of the following medical problems, you can make an appointment at an Urgent Care
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-lg-12">
+                                                        <p><strong>Non-life-threatening illnesses</strong></p>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <ul>
+                                                            <li>Fractures</li>
+                                                            <li>Sprain or strain of the ankle, knee, or shoulder</li>
+                                                            <li>Burns</li>
+                                                            <li>Minor Injury from car accidents</li>
+                                                            <li>Yeast infections</li>
+                                                            <li>Mono</li>
+                                                            <li>Colds</li>
+                                                            <li>Ear Infection</li>
+                                                            <li>Rash</li>
+                                                            <li>Sore throat</li>
+                                                            <li>Diarrhea</li>
+                                                            <li>Other unexplained pain or swelling</li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                            <li>Whiplash</li>
+                                                            <li>Cuts and lacerations</li>
+                                                            <li>Injury from falls</li>
+                                                            <li>Urinary tract infections</li>
+                                                            <li>Pink eye</li>
+                                                            <li>Bronchitis</li>
+                                                            <li>Flu</li>
+                                                            <li>Swollen glands</li>
+                                                            <li>Wheezing</li>
+                                                            <li>Minor abdominal pain</li>
+                                                            <li>Headaches</li>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-12 text-center">
+                                                        <span>Proceed with:&nbsp;&nbsp;&nbsp;</span>
+                                                        <button id="btnEmergency" type="button" class="btn btn-default">Emergency Room</button>
+                                                        <span>&nbsp;&nbsp;&nbsp;OR&nbsp;&nbsp;&nbsp;</span>
+                                                        <button id="btnUrgentCare" type="button" class="btn btn-default">Urgent Care</button>
+                                                    </div>
+                                                </div>
+
+                                    </div>
+                                </div>
+                                <div id="divModalContentServiceArea" class="modal-content displayNone">
+                                    <div class="modal-header modal-header-custom-style">
+                                        <h4>Urgent Care</h4>
+                                    </div>
+                                    <div class="modal-body modal-body-custom-style">
+                                        <div class="text-center">
+                                        <h4>
+                                            You are outside the service area. Ignore your current location?
+                                        </h4>
+                                        <br />
+                                    <button id="btnIgnoreCurLocYes" type="button" class="btn btn-default">Yes</button>
+                    <button id="btnIgnoreCurLocNo" type="button" class="btn btn-default">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+ </div>
+
+                    </div>
+                </div>
+                <!-- End Map -->
+                <!-- Start Display Locations -->
+                <div class="col-xs-12 col-sm-6 search-right-column col-block pull-right ">
+                        <div class="search-nav">
+							<div class="input-group">
+								<label class="sr-only" for="zip-code">zip code</label>
+								<div class="search-wrapper">
+                                    <label class="sr-only" for="locSearchAutocomplete">Autocomplete location search in Salon locator page</label>
+									<input type="text" class="form-control" id="search_zipcode" name="search_zipcode" placeholder="ZIP Code" autocomplete="off"/>
+								</div>
+								<span class="input-group-btn">
+									<button class="btn btn-default location-search-btn customTheme" type="button" name="btnlocationsearch" id="btnlocationsearch">GO</button>
+								</span>
+							</div>
+						</div>
+                    <div class="result-container collapse">
+							<!--End sort nav-->
+							<div class="location-search-results tab-content">
+								<div class="tab-pane fade in active closer-to-you">
+
+                                    <div id="closer-to-you" class="locations map-directions ">
+                                        <!-- Display Nearest Urgent Care -->
+
+                                    </div>
+								</div>
+
+							</div>
+							<!--End Sort Locations-->
+					</div>
+
+                </div>
+                <!-- End Display Locations -->
+            </div>
+        </div>
+    </div>
+
+<!-- Help Model -->
+    <div id="modelHelp" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-header-custom-style">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4>   Know your options: Emergency Room vs. Urgent Care</h4>
+                </div>
+                <div class="modal-body modal-body-custom-style">
+                    <p>
+
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    When to choose Urgent Care
+                </div>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    Choosing an urgent care is a convenient option when you need to see a doctor after normal hours or during weekends or even when you don’t have quick access to your regular physician. Most of urgent care facilities offer some onsite diagnostic tests which can provide you with a faster service at a better price. Please note that urgent cares are not suitable options in case of life-threatening conditions.
+                </li>
+            </ul>
+    </div>
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            When to go to Emergency Room (ER)
+        </div>
+        <ul class="list-group">
+                <li class="list-group-item">
+
+                    Emergency rooms are the best choice for treating severe medical conditions such as stroke, heart attack, severe bleeding, accidental injuries, poisoning, vomiting blood and any other severe medical situations. Being open 247, ERs offer the wide range of emergency services/tests with many specialists on call. Usually ERs are crowded and since they offer specialized care you may wait longer and end up paying more to get treated.
+                    <br/>
+                    This is an interactive “DEMO” web application that can provide you with a list of all nearby urgent care and ER facilities and their estimated wait time.
+                    This "DEMO" is currently under test and it is not "FUNCTIONAL".
+
+                </li>
+
+        </ul>
+    </div>
+
+                    </p>
+                </div>
+            </div>
+        </div>
+</div>
+
+<input type="hidden" name="csrfmiddlewaretoken" id="csrfmiddlewaretoken" value="{{ csrf_token }}"/>
+
+<!-- End Help Model -->
+
+<!-- Feedback Model -->
+
+ <div id="modelFeedback" class="modal fade" role="dialog">
+     <div class="modal-dialog">
+        <form action="/appointments/feedback/" class="form-horizontal" data-ajax="true" data-ajax-begin="$.blockUI" data-ajax-complete="$.unblockUI" data-ajax-failure="indexWaitTimes.AjaxFail" data-ajax-method="POST" data-ajax-success="indexWaitTimes.CreateFeedbackSuccess" id="formCreateFeedback" method="post" role="form">
+            <div class="modal-content">
+                <div class="modal-header modal-header-custom-style">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="titleLabelContent">
+                        Urgent Care and ER Wait Time
+                    </h4>
+                </div>
+                <div class="modal-body modal-body-custom-style">
+                    <h4>Provide Feedback</h4>
+                    <p class="small">
+                        Thank you for providing feedback regarding this website, its design, and how it has been implemented.
+                    </p>
+                    <p class="small">
+                        <strong>Please do not submit any healthcare treatment feedback here.</strong>
+                        Redirect those comments to the healthcare provider/facility.
+                    </p>
+
+                    <input name="csrfmiddlewaretoken" type="hidden" value="{{ csrf_token }}" />
+
+                    <div class="form-group">
+                        <div class="col-sm-4">
+                            <label class="control-label" for="Email">Email<span class="mandatory" title="Required">*</span></label>
+                        </div>
+                        <div class="col-sm-8">
+                            <input class="form-control" data-val="true" data-val-length="Max 256!" data-val-length-max="150" data-val-regex="Invalid! person@domain.com" data-val-regex-pattern="\w+([-+.&#39;]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*" data-val-required="Required!" id="Email" name="Email" type="text" value="" />
+                            <span class="field-validation-valid small" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-4">
+                            <label class="control-label" for="Liked">Did you like it?<span class="mandatory" title="Required">*</span></label>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="btn-group" data-toggle="buttons">
+                                    <label class="btn btn-sm btn-default">
+                                        <span class="fa fa-thumbs-o-up"></span>
+                                        <input type="radio" name="Liked" id="Liked_True" value="like" data-val="true" data-val-required="Required!" />
+                                        Like
+                                    </label>
+                                    <label class="btn btn-sm btn-default">
+                                        <span class="fa fa-thumbs-o-down"></span>
+                                        <input type="radio" name="Liked" id="Liked_False" value="unlike" data-val="true" data-val-required="Required!" />
+                                        Dislike
+                                    </label>
+                            </div>
+                            <span class="field-validation-valid small" data-valmsg-for="Liked" data-valmsg-replace="true"></span>
+                            <strong id="strongLikedMsg" class="text-primary displayNone">
+
+                                <span class="fa fa-thumbs-o-up"></span>
+                                You liked it!
+                            </strong>
+                            <strong id="strongDislikedMsg" class="text-warning displayNone">
+                                <br class="visible-xs-inline" />
+                                Comment below and help us.
+                            </strong>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-4">
+                            <label class="control-label" for="Comments">Comments</label>:
+                        </div>
+                        <div class="col-sm-8">
+                            <textarea class="form-control maxWidthNone" data-val="true" data-val-length="Max 1000!" data-val-length-max="1000" id="Comments" name="Comments" rows="5" placeholder="Comment on why you did or did not like this website and/or suggestions for improving it..."></textarea>
+                            <span class="field-validation-valid small" data-valmsg-for="Comments" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer modal-footer-custom-style">
+                    <div class="text-left">
+                        <input type="submit" class="btn btn-default" value="Submit" />
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+    </form>
+     </div>
+</div>
+
+
+    </div>
+</div>
+
+{% endblock %}
